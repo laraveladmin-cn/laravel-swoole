@@ -4,6 +4,7 @@ namespace SwooleTW\Http\Server\Resetters;
 
 use SwooleTW\Http\Server\Sandbox;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Config\Repository;
 
 class ResetConfig implements ResetterContract
 {
@@ -17,7 +18,10 @@ class ResetConfig implements ResetterContract
      */
     public function handle(Container $app, Sandbox $sandbox)
     {
-        $app->instance('config', clone $sandbox->getConfig());
+        //深度拷贝配置,不要地址引用
+        $items = json_decode(json_encode($sandbox->getConfig()->all()),true);
+        $app->instance('config', new Repository($items));
+        //$app->instance('config', clone $sandbox->getConfig());
 
         return $app;
     }
